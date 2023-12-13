@@ -12,6 +12,7 @@ import React, {
   useMemo,
   memo,
   JSXElementConstructor,
+  Ref,
 } from "react";
 import { useUpdate } from "@/lib/useUpdate";
 import Fuse, { FuseOptionKey, FuseResult } from "fuse.js";
@@ -25,9 +26,11 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandItem,
+  CommandShortcut,
+  CommandSeparator,
 } from "@/components/ui/command";
-import * as LucideIcons from "lucide-react";
 import * as _ from 'lodash-es'
+import { useIsSSR } from "@react-aria/ssr";
 
 const log = createDebug("srch");
 createDebug.disable()
@@ -35,10 +38,11 @@ log("init...");
 
 
 
-const keyFuse = new Fuse(['title'], {
+const keyFuse = new Fuse(['keyFuse_not_loaded'], {
     includeScore: true,
     isCaseSensitive: false,
-    findAllMatches: true
+    findAllMatches: true,
+    threshold: .5
 })
 
 // log(`iconFuse:`, iconFuse.search('^activ'))
@@ -63,7 +67,7 @@ const DEFAULT_CONTEXT: SrchCtx = {
     ignoreFieldNorm: false,
     fieldNormWeight: 0.2,
     findAllMatches: true,
-    threshold: 1,
+    threshold: .5,
     keys: [],
   },
 };
@@ -73,6 +77,7 @@ const srchCtx = createContext<BaseCtx>({
   setCtx: () => {},
   mergeCtx: () => {},
 });
+
 
 function findValueLike(item:any, like:string[]) {
 try{
@@ -167,17 +172,39 @@ export const SrchProvider = ({
   searchable = [],
   searchKeys = [],
   groupBy,
-  placeholder = '`srch`  by  /pratiqdev',
   children,
+
+  renderWindow = true,
+  placeholder = '`srch`  by  /pratiqdev',
+  NoSearchComponent = () => {
+    const { value } = useSrch()
+    return <p>Search for <b>{value || 'anything!'}</b></p>
+  },
+  NoResultsComponent = () => {
+    const { value } = useSrch()
+    return <p>No results for <b className="tracking-wide">{value}</b></p>
+  },
+  RenderItem,
+  RenderList, 
 }: {
-    placeholder: string;    
+  /** provider - array of strings, numbers or objects to search */
   searchable?: any[];
   searchKeys?: FuseOptionKey<any>[];
   groupBy?: string;
   children?: ReactNode;
+  
+  /** window - text placeholder for the search input */
+  renderWindow?: boolean;
+  portalInto?: Ref<HTMLElement>
+  placeholder?: string;
+  NoSearchComponent?: () => ReactNode;
+  NoResultsComponent?: () => ReactNode;
+  RenderItem?:  ({ result, index }:{ result: FuseResult<any>, index: number }) => ReactNode;
+  RenderList?:  ({ results, value, onSelect }:{ results: FuseResult<any>[],  groupedResults: [string, FuseResult<any>[]][], value: string, onSelect: (value:any) => void }) => ReactNode;
 }) => {
   const [ctx, setCtx] = useState<SrchCtx>(DEFAULT_CONTEXT);
   const fuseRef = useRef<null | Fuse<any>>(null);
+  const isSsr = useIsSSR()
 
   /** Merge new state with existing state
    *
@@ -196,29 +223,39 @@ export const SrchProvider = ({
       log("Context merge error:", err);
     }
   };
-
-
-  const parseSearchableData = () => {
-    if (!Array.isArray(searchable)) {
-        log(`The data provided to srch must be an array. Recieved:`, searchable)
-        return
-    }
-
-
-    /*
-        get likely keys used for displaying in the default item
-        the searchable array may have:
-        item.title || item.Title || item.mainTitle || item.heading
-        and could be parsed with fuse to find any keys similar to 'title' => 'mainTitle'
-
-
-    */
-
-    
-    
-    mergeCtx({ searchable });
+  const onSelect = (value:any) => {
+    console.log('selected item:', value)
   }
 
+  const GroupedResults = () => (
+      <>
+        {ctx.groupedResults?.map(([section, data]:[string, FuseResult<any>[]], index:number) => (
+          <React.Fragment key={index}>
+          <CommandGroup key={section} heading={section} hidden={!data.length}>
+              {data.map((d, idx) => (
+                  RenderItem && 
+                    <CommandItem onSelect={() => onSelect(d)}>
+                      <RenderItem key={idx} result={d} index={idx} /> 
+                    </CommandItem>
+                  // : <DefaultItem key={idx} type={section} item={d.item} />
+              ))}
+          </CommandGroup>
+          <CommandSeparator />
+          </React.Fragment>
+      ))}
+      </>
+  )
+  const Results = () => (
+      <>
+        {ctx.searchResults?.map((d, idx) => 
+          RenderItem &&
+          <CommandItem onSelect={() => onSelect(d)}>
+            <RenderItem key={idx} result={d} index={idx} />
+          </CommandItem>
+              // : <DefaultItem key={JSON.stringify({idx, item: d.item})} type={d.item.type} item={d.item} /> 
+        )}
+      </>
+  )
 
 
   // perform search
@@ -274,47 +311,98 @@ export const SrchProvider = ({
 
   // get the searchable data from props (this useEffect is for handling props from this component)
   useEffect(() => {
-    parseSearchableData()
+    if (!Array.isArray(searchable)) {
+        log(`The data provided to srch must be an array. Received:`, searchable)
+        return
+    }
+    mergeCtx({ searchable });
   }, [searchable]);
 
   return (
-    <srchCtx.Provider value={{ ctx, setCtx, mergeCtx }}>
+    <srchCtx.Provider value={{ ctx, setCtx, mergeCtx }} >
+
       {children}
-      <pre className="text-xs left-0 w-[50vw]">
-            {JSON.stringify({ ...ctx }, null, 2)}
+
+      {renderWindow && 
+        <CommandDialog
+            open={isSsr ? false : ctx.isWindowOpen}
+            onOpenChange={b => mergeCtx({ isWindowOpen: b })}
+            shouldFilter={false}
+        >
+        <CommandInput
+            placeholder={placeholder}
+            value={ctx.searchValue}
+            onValueChange={v => mergeCtx({ searchValue: v })}
+        />
+        {/* <div>autocomplete</div> */}
+        <CommandList className="h-auto">
+          
+            {(ctx.searchValue.length >= ctx.fuseConfig.minMatchCharLength && ctx.searchResults.length === 0) && 
+              <CommandItem className="h-[10rem] flex items-center justify-center" disabled>
+                <NoResultsComponent  />
+              </CommandItem>
+            }
+            {(ctx.searchValue.length < ctx.fuseConfig.minMatchCharLength && ctx.searchResults.length === 0) && 
+              <CommandItem className="h-[10rem] flex items-center justify-center" disabled>
+                <NoSearchComponent /> 
+              </CommandItem>
+            }
+
+            {RenderList ? <RenderList results={ctx.searchResults} groupedResults={ctx.groupedResults} value={ctx.searchValue} onSelect={onSelect} /> : groupBy ? <GroupedResults /> : <Results />}
+            {/* {true && 
+              <CommandGroup heading='Recommended'>
+
+              </CommandGroup>
+            } */}
+        </CommandList>
+        </CommandDialog>
+      }
+
+
+      
+      <pre className="text-gray-700 dark:text-gray-200 text-xs ">
+            {JSON.stringify(ctx, null, 2)}
         </pre>
     </srchCtx.Provider>
   );
 };
 
 //========================================================================================================================
-const DefaultItem = ({
-  type,
-  item,
-}: {
-  type: string;
-  item: FuseResult<any>["item"];
-}) => {
-    const { config } = useSrch()
+// const DefaultItem = ({
+//   type,
+//   item,
+// }: {
+//   type: string;
+//   item: FuseResult<any>["item"];
+// }) => {
+//     const { config } = useSrch()
 
-    return (
-        <CommandItem onSelect={e => console.log('selected:', e)}>
-            {/* {SelectedIcon && <SelectedIcon className="mr-2 h-4 w-4 min-w-[1.5rem] text-indigo-500" />} */}
-            <div className="flex flex-col text-xs overflow-hidden">
-            <span className="font-medium">
-                {findValueLike(item, ['title', 'name', 'username', 'heading'])}
-            </span>
-            <span className="font-medium">
-                {findValueLike(item, ['user', 'id', 'userid', 'email', 'city'])}
-            </span>
-            <span className="truncate font-light">
-                {findValueLike(item, ['company', 'content', 'text', 'body'])}
-            </span>
-            </div>
-        </CommandItem>
-    );
+//     return (
+//         <CommandItem onSelect={e => console.log('selected:', e)}>
+//             {/* {SelectedIcon && <SelectedIcon className="mr-2 h-4 w-4 min-w-[1.5rem] text-indigo-500" />} */}
+//             <div className="flex flex-col text-xs overflow-hidden">
+//             <span className="font-medium">1-
+//               {findValueLike(item, ['title', 'heading', 'author', 'user'])}
+//             </span>
+//             <span className="font-medium">2-
+//               {findValueLike(item, ['author', 'user', 'creator', 'username'])}
+//             </span>
+
+//             <span className="font-medium">3-
+//               {findValueLike(item, ['date', 'createdAt'])}
+//             </span>
+
+//             <span className="font-medium">4-
+//               {findValueLike(item, ['body', 'text', 'content'])}
+//             </span>
+//             <span className="truncate font-light">5-
+//               {findValueLike(item, ['href', 'link', 'website', 'url'])}
+//             </span>
+//             </div>
+//         </CommandItem>
+//     );
   
-};
+// };
 
 
 
@@ -322,79 +410,81 @@ const DefaultItem = ({
 
 
 //========================================================================================================================
-export const SrchWindow = ({
-    placeholder = '`srch`  by  /pratiqdev',
-    noSearchComponent,
-    noResultsComponent,
-    RenderItem,
-    RenderList,
-}:{
-    placeholder?: string;
-    noSearchComponent?: ReactNode;
-    noResultsComponent?: ReactNode;
-    RenderItem?:  ({ result, index, onSelect }:{ result: FuseResult<any>, index: number, onSelect: (value:any) => void }) => ReactNode;
-    RenderList?:  ({ results, value, onSelect }:{ results: FuseResult<any>[],  groupedResults: [string, FuseResult<any>[]][], value: string, onSelect: (value:any) => void }) => ReactNode;
-}) => {
-  const { value, setValue, results, groupedResults, isWindowOpen, toggleWindow, config, groupBy } = useSrch();
+// export const SrchWindow = ({
+//     placeholder = '`srch`  by  /pratiqdev',
+//     noSearchComponent,
+//     noResultsComponent,
+//     RenderItem,
+//     RenderList,
+// }:{
+//     placeholder?: string;
+//     noSearchComponent?: ReactNode;
+//     noResultsComponent?: ReactNode;
+//     RenderItem?:  ({ result, index, onSelect }:{ result: FuseResult<any>, index: number, onSelect: (value:any) => void }) => ReactNode;
+//     RenderList?:  ({ results, value, onSelect }:{ results: FuseResult<any>[],  groupedResults: [string, FuseResult<any>[]][], value: string, onSelect: (value:any) => void }) => ReactNode;
+// }) => {
+//   const { value, setValue, results, groupedResults, isWindowOpen, toggleWindow, config, groupBy } = useSrch();
 
-  const onSelect = (value:any) => {
-    console.log('selected item:', value)
-  }
+//   const onSelect = (value:any) => {
+//     console.log('selected item:', value)
+//   }
 
-    const GroupedResults = () => (
-        <>
-         {groupedResults?.map(([section, data]:[string, FuseResult<any>[]]) => (
-            <CommandGroup key={section} heading={section} hidden={!data.length}>
-                {data.map((d, idx) => (
-                    RenderItem 
-                    ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
-                    : <DefaultItem key={idx} type={section} item={d.item} />
-                ))}
-            </CommandGroup>
-        ))}
-        </>
-    )
-    const Results = () => (
-        <>
-         {results?.map((d, idx) => 
-            RenderItem 
-                ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
-                : <DefaultItem key={JSON.stringify({idx, item: d.item})} type={d.item.type} item={d.item} /> 
-         )}
-        </>
-    )
+//     const GroupedResults = () => (
+//         <>
+//          {groupedResults?.map(([section, data]:[string, FuseResult<any>[]]) => (
+//             <CommandGroup key={section} heading={section} hidden={!data.length}>
+//                 {data.map((d, idx) => (
+//                     RenderItem 
+//                     ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
+//                     : <DefaultItem key={idx} type={section} item={d.item} />
+//                 ))}
+//             </CommandGroup>
+//         ))}
+//         </>
+//     )
+//     const Results = () => (
+//         <>
+//          {results?.map((d, idx) => 
+//             RenderItem 
+//                 ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
+//                 : <DefaultItem key={JSON.stringify({idx, item: d.item})} type={d.item.type} item={d.item} /> 
+//          )}
+//         </>
+//     )
 
-    return (
-        <CommandDialog
-            open={isWindowOpen}
-            onOpenChange={toggleWindow}
-            shouldFilter={false}
+//     return (
+//         <CommandDialog
+//             open={isWindowOpen}
+//             onOpenChange={toggleWindow}
+//             shouldFilter={false}
         
         
-        >
-        <CommandInput
-            placeholder={placeholder}
-            value={value}
-            onValueChange={setValue}
-        />
-        <CommandList>
-            {(value.length >= config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noResultsComponent ?? "No Results"}</CommandEmpty>}
-            {(value.length < config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noSearchComponent ?? "Search for something!"}</CommandEmpty>}
-            {RenderList ? <RenderList results={results} groupedResults={groupedResults} value={value} onSelect={onSelect} /> : groupBy ? <GroupedResults /> : <Results />}
-            {/* {results?.map(([section, data]) => (
-            <CommandGroup key={section} heading={section} hidden={!data.length}>
-                {data.map((d, idx) => (
-                <Item key={idx} type={section} item={d.item} />
-                ))}
-            </CommandGroup>
-            ))} */}
-        </CommandList>
-        </CommandDialog>
-    );
+//         >
+//         <CommandInput
+//             placeholder={placeholder}
+//             value={value}
+//             onValueChange={setValue}
+//         />
+//         <CommandList>
+//             {(value.length >= config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noResultsComponent ?? "No Results"}</CommandEmpty>}
+//             {(value.length < config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noSearchComponent ?? "Search for something!"}</CommandEmpty>}
+//             {RenderList ? <RenderList results={results} groupedResults={groupedResults} value={value} onSelect={onSelect} /> : groupBy ? <GroupedResults /> : <Results />}
+//             {/* {results?.map(([section, data]) => (
+//             <CommandGroup key={section} heading={section} hidden={!data.length}>
+//                 {data.map((d, idx) => (
+//                 <Item key={idx} type={section} item={d.item} />
+//                 ))}
+//             </CommandGroup>
+//             ))} */}
+//         </CommandList>
+//         </CommandDialog>
+//     );
 
-};
+// };
 
 
 
 
 // TODO - Make SrchWindow a built-in part of the provider, only SearchBar should be separate
+
+export default SrchProvider

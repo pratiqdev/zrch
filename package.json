@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@react-aria/ssr": "^3.9.0",
     "@types/debug": "^4.1.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",

@@ -1,40 +1,26 @@
-"use client"
-import { SrchProvider, SrchWindow } from '@/components/srch/Srch'
-import { FuseResult } from 'fuse.js'
 import Image from 'next/image'
-import { commentData, albumData,  userData, customData } from '@/components/srch/test-data'
-import { ItemRender, ListRender } from '@/components/srch/customRender'
-
+import AppSearch from '@/components/AppSearch'
+import { Button } from '@/components/ui/button'
 
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center" suppressHydrationWarning>
+    <main className="flex min-h-screen flex-col items-center pt-16 max-w-[800px] mx-auto" suppressHydrationWarning>
      
-
-      <div className="relative text-3xl font-bold">
-        srch
+      <div className="flex items-center justify-between w-full">
+        <div>
+          <h1 className="text-3xl font-bold tracking-wide">srch</h1>
+          <p className="text-lg">Drop-in, feature-rich, search component</p>
+        </div>
+        <div className="flex flex-col items-end">
+          <Button>npm</Button>
+          <Button>github</Button>
+        </div>
       </div>
 
+      <AppSearch />
 
 
-      <SrchProvider 
-        searchable={[
-          // ...albumData, 
-          // ...commentData, 
-          // ...userData
-          ...customData
-        ]}  
-        // groupBy='email'
-        // searchKeys={['name']}
-      >
-        <SrchWindow 
-         RenderItem={ItemRender} 
-          // RenderList={ListRender}
-          noResultsComponent={<p>No Results!!!</p>}
-        />
-        
-      </SrchProvider>
 
 
 
