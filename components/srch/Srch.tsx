@@ -211,7 +211,7 @@ export const SrchProvider = ({
    * causes global rerender as object ref change causes react state update */
   const mergeCtx = (
     newCtx: Partial<SrchCtx> | SetStateAction<Partial<SrchCtx>>
-  ) => {
+  ) => { 
     try {
       log(`Merging new ctx:`, newCtx);
       setCtx((x) =>
