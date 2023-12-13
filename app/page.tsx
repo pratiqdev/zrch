@@ -2,35 +2,10 @@
 import { SrchProvider, SrchWindow } from '@/components/srch/Srch'
 import { FuseResult } from 'fuse.js'
 import Image from 'next/image'
-import { commentData, albumData,  userData } from '@/components/srch/test-data'
+import { commentData, albumData,  userData, customData } from '@/components/srch/test-data'
+import { ItemRender, ListRender } from '@/components/srch/customRender'
 
 
-export const ItemRender = ({ result, index }:{ result: FuseResult<any>, index: number}) => {
-  const { postId, name, email, body } = result.item
-
-  return (
-    <li className="overflow-hidden text-xs p-1 bg-slate-100 rounded">
-      <p className="font-medium">{name}</p>
-      <p className='truncate font-light'>{body}</p>
-    </li>
-  )
-}
-
-export const ListRender = ({ results, value }:{ results: FuseResult<any>[], value: string}) => (
-  <>
-    {results.map(res => {
-      const { postId, name, email, body } = res.item
-
-      return (
-        <li className="overflow-hidden text-xs p-1 bg-slate-100 rounded">
-          <p className="font-medium">{name}</p>
-          <p className='truncate font-light'>{body}</p>
-        </li>
-      )
-    })}
-  </>
-
-)
 
 export default function Home() {
   return (
@@ -47,13 +22,14 @@ export default function Home() {
         searchable={[
           // ...albumData, 
           // ...commentData, 
-          ...userData
+          // ...userData
+          ...customData
         ]}  
         // groupBy='email'
         // searchKeys={['name']}
       >
         <SrchWindow 
-        //  RenderItem={ItemRender} 
+         RenderItem={ItemRender} 
           // RenderList={ListRender}
           noResultsComponent={<p>No Results!!!</p>}
         />

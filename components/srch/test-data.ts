@@ -1,3 +1,5 @@
+import * as LucideIcons from 'lucide-react'
+
 /** groupBy `postId` */
 export const commentData = [
     {
@@ -4238,4 +4240,37 @@ export const userData = [
       "bs": "target end-to-end models"
     }
   }
+]
+
+export const customData = [
+  {
+    icon: 'Link',
+    title: 'Sicc Link',
+    text: 'Just a cool link for linking your links'
+  },
+  {
+    icon: 'Link',
+    title: 'Another Link',
+    text: 'Maybe not as cool as the last one'
+  },
+  {
+    icon: 'User',
+    title: 'John Smith',
+    text: 'Regular dude, extreme sports'
+  },
+  {
+    icon: 'User',
+    title: 'Erlich Bachman',
+    text: 'Creator of Aviato'
+  },
+  {
+    icon: 'GitBranch',
+    title: 'nestore',
+    text: 'Event-based state management API for react and typescript'
+  },
+  {
+    icon: 'GitBranch',
+    title: 'Etherable',
+    text: 'Ethereum and solidity online education platform'
+  },
 ]

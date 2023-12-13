@@ -34,10 +34,6 @@ createDebug.disable()
 log("init...");
 
 
-const iconFuse = new Fuse(Object.keys(LucideIcons), {
-    isCaseSensitive: false,
-    useExtendedSearch: true,
-})
 
 const keyFuse = new Fuse(['title'], {
     includeScore: true,
@@ -171,8 +167,10 @@ export const SrchProvider = ({
   searchable = [],
   searchKeys = [],
   groupBy,
+  placeholder = '`srch`  by  /pratiqdev',
   children,
 }: {
+    placeholder: string;    
   searchable?: any[];
   searchKeys?: FuseOptionKey<any>[];
   groupBy?: string;
@@ -230,7 +228,7 @@ export const SrchProvider = ({
             
     mergeCtx({ 
         searchResults: res,
-        groupedResults: groupedRes,
+        groupedResults: groupedRes as typeof groupedRes,
         groupBy
     });
   }, [ctx.searchValue, groupBy]);
@@ -282,9 +280,9 @@ export const SrchProvider = ({
   return (
     <srchCtx.Provider value={{ ctx, setCtx, mergeCtx }}>
       {children}
-      {/* <pre className="text-xs left-0 w-[50vw]">
-            {JSON.stringify({ ...ctx, searchable: ["set"] }, null, 2)}
-        </pre> */}
+      <pre className="text-xs left-0 w-[50vw]">
+            {JSON.stringify({ ...ctx }, null, 2)}
+        </pre>
     </srchCtx.Provider>
   );
 };
@@ -328,19 +326,29 @@ export const SrchWindow = ({
     placeholder = '`srch`  by  /pratiqdev',
     noSearchComponent,
     noResultsComponent,
+    RenderItem,
+    RenderList,
 }:{
     placeholder?: string;
     noSearchComponent?: ReactNode;
     noResultsComponent?: ReactNode;
+    RenderItem?:  ({ result, index, onSelect }:{ result: FuseResult<any>, index: number, onSelect: (value:any) => void }) => ReactNode;
+    RenderList?:  ({ results, value, onSelect }:{ results: FuseResult<any>[],  groupedResults: [string, FuseResult<any>[]][], value: string, onSelect: (value:any) => void }) => ReactNode;
 }) => {
   const { value, setValue, results, groupedResults, isWindowOpen, toggleWindow, config, groupBy } = useSrch();
+
+  const onSelect = (value:any) => {
+    console.log('selected item:', value)
+  }
 
     const GroupedResults = () => (
         <>
          {groupedResults?.map(([section, data]:[string, FuseResult<any>[]]) => (
             <CommandGroup key={section} heading={section} hidden={!data.length}>
                 {data.map((d, idx) => (
-                    <DefaultItem key={idx} type={section} item={d.item} />
+                    RenderItem 
+                    ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
+                    : <DefaultItem key={idx} type={section} item={d.item} />
                 ))}
             </CommandGroup>
         ))}
@@ -348,15 +356,19 @@ export const SrchWindow = ({
     )
     const Results = () => (
         <>
-         {results?.map((d, idx) => <DefaultItem key={JSON.stringify({idx, item: d.item})} type={d.item.type} item={d.item} /> )}
+         {results?.map((d, idx) => 
+            RenderItem 
+                ? <RenderItem key={idx} result={d} index={idx} onSelect={onSelect} /> 
+                : <DefaultItem key={JSON.stringify({idx, item: d.item})} type={d.item.type} item={d.item} /> 
+         )}
         </>
     )
 
     return (
         <CommandDialog
-        open={isWindowOpen}
-        onOpenChange={toggleWindow}
-        shouldFilter={false}
+            open={isWindowOpen}
+            onOpenChange={toggleWindow}
+            shouldFilter={false}
         
         
         >
@@ -368,7 +380,7 @@ export const SrchWindow = ({
         <CommandList>
             {(value.length >= config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noResultsComponent ?? "No Results"}</CommandEmpty>}
             {(value.length < config.minMatchCharLength && results.length === 0) && <CommandEmpty>{noSearchComponent ?? "Search for something!"}</CommandEmpty>}
-            {groupBy ? <GroupedResults /> : <Results />}
+            {RenderList ? <RenderList results={results} groupedResults={groupedResults} value={value} onSelect={onSelect} /> : groupBy ? <GroupedResults /> : <Results />}
             {/* {results?.map(([section, data]) => (
             <CommandGroup key={section} heading={section} hidden={!data.length}>
                 {data.map((d, idx) => (
@@ -383,3 +395,6 @@ export const SrchWindow = ({
 };
 
 
+
+
+// TODO - Make SrchWindow a built-in part of the provider, only SearchBar should be separate
