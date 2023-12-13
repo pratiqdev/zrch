@@ -13,5 +13,5 @@ export const useUpdate = (fn:() => void, inputs: any[]) => {
    } else {
      isMountingRef.current = false;
    }
- }, inputs);
+ }, [...inputs]);
 };

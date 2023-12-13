@@ -21,9 +21,11 @@ export type MetaConfig = {
     attributionText: ReactNode;
 }
 
-export type SrchCtx = {
+export type SrchCtx<T> = {
 	searchValue: string;
-	searchResults: FuseResult<any>[];
+	searchResults: FuseResult<T>[];
+    recommended: T[];
+    autocomplete: string[];
     isWindowOpen: boolean;
     searchable: any[];
     fuseConfig: FuseConfig;
@@ -33,10 +35,10 @@ export type SrchCtx = {
 	[key:string] : any
 }
 
-export type BaseCtx = {
-	ctx: SrchCtx;
-	setCtx: Dispatch<SetStateAction<SrchCtx>>;
-	mergeCtx: (newCtx: Partial<SrchCtx> | SetStateAction<Partial<SrchCtx>>) => void;
+export type BaseCtx<T> = {
+	ctx: SrchCtx<T>;
+	setCtx: Dispatch<SetStateAction<SrchCtx<T>>>;
+	mergeCtx: (newCtx: Partial<SrchCtx<T>> | SetStateAction<Partial<SrchCtx<T>>>) => void;
 }
 
 

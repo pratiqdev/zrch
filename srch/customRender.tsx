@@ -1,5 +1,5 @@
 import { FuseResult } from "fuse.js";
-import { CommandItem, CommandGroup } from "../ui/command";
+import { CommandItem, CommandGroup } from "../components/ui/command";
 import * as LucideIcons from 'lucide-react'
 
 export const ItemRender = ({
@@ -14,10 +14,10 @@ export const ItemRender = ({
 
   return (
     <div className="flex text-xs overflow-hidden items-center">
-        <Icon />
-        <div className="flex flex-col ml-2">
+        {Icon && <Icon />}
+        <div className="flex flex-col ml-2 tracking-wide">
           <span className="font-medium">{title}</span>
-          <span className="font-medium">{text}</span>
+          <span className="font-light">{text}</span>
         </div>
     </div>
   );

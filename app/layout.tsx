@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { Inter as FontSans } from "next/font/google"
 import { cn } from "@/lib/utils"
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata: Metadata = {
   title: 'srch',
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 
-export const fontSans = FontSans({
+const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 })
@@ -20,13 +21,22 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className='dark' style={{ colorScheme: 'dark' }}>
-      <body
-        className={cn(
-          "min-h-screen bg-white dark:bg-gray-950 font-sans antialiased",
-          fontSans.variable
-        )}
-      >{children}</body>
+    <html lang="en" suppressHydrationWarning>
+        <body
+          className={cn(
+            "min-h-screen bg-indigo-50 dark:bg-gray-950 font-sans antialiased",
+            fontSans.variable
+          )}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            // disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
     </html>
   )
 }

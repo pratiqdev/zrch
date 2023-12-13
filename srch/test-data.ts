@@ -4261,7 +4261,7 @@ export const customData = [
   {
     icon: 'User',
     title: 'Erlich Bachman',
-    text: 'Creator of Aviato'
+    text: 'Creator of Aviato. Equally fat and poor.'
   },
   {
     icon: 'GitBranch',
