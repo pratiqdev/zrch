@@ -53,7 +53,7 @@ const TEST_LOADING = true
 
 
 const GitHubButton = () => (
-  <Link passHref href="">
+  <Link passHref href="https://github.com/pratiqdev/srch">
 
   <Button
     variant="ghost"
@@ -68,7 +68,8 @@ const GitHubButton = () => (
 )
 
 const NpmButton = () => (
-  <>
+  <Link passHref href="https://npmjs.org">
+    
   <Button
   disabled
     variant="secondary"
@@ -80,10 +81,12 @@ const NpmButton = () => (
       <CopyIcon />
     </div>
   </Button>
-  </>
+  </Link>
 )
 
 const UserButton = () => (
+  <Link passHref href="https://github.com/pratiqdev">
+
   <Button
     variant="secondary"
     className="w-min sm:w-full flex items-center gap-2 px-2 pl-4 group"
@@ -93,6 +96,7 @@ const UserButton = () => (
       <Image fill alt='avatar' src='https://avatars.githubusercontent.com/u/53705976?v=4' />
     </div>
   </Button>
+  </Link>
 )
 
 export default function Home() {
