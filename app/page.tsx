@@ -5,8 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { CopyIcon, ExternalLink, GithubIcon, HeartHandshake, HeartIcon, ReplyIcon } from "lucide-react";
 import Link from "next/link";
-// import { CodeBlock } from "@/components/code-block";
-
 import dynamic from 'next/dynamic'
 
 const CodeBlock = dynamic(() => import('@/components/code-block'), {
@@ -15,10 +13,42 @@ const CodeBlock = dynamic(() => import('@/components/code-block'), {
 
 const AppSearch = dynamic(() => import('@/components/AppSearch'), {
   ssr: false,
-  loading: () => <p className="w-full h-[395px] bg-white dark:bg-gray-800 flex justify-center items-center text-gray-500 rounded-xl">
-    <Skeleton className="w-full h-6" />
-  </p>,
+  loading: () => <div className="border border-gray-100 dark:border-gray-800 overflow-hidden w-full h-[395px] bg-white dark:bg-gray-950 flex flex-col text-gray-500 rounded-xl">
+    <Skeleton className="w-full h-10 bg-gray-200 dark:bg-gray-800" />
+    <div className="flex flex-col p-2 gap-3 min-h-[20rem] max-h-[20rem] overflow-hidden">
+
+      <Skeleton className="w-[12ch] h-3 bg-gray-100  dark:bg-gray-800 rounded" />
+      {Array(3).fill(1).map((n, i) =>
+        <div key={i} className="w-full flex gap-2">
+          <Skeleton className="h-10 w-10  bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="flex flex-col w-full justify-between">
+            <Skeleton className="h-4 w-[12ch] bg-gray-200  dark:bg-gray-700 rounded" />
+            <Skeleton className="h-4 bg-gray-100  dark:bg-gray-800 rounded" />
+          </div>
+        </div>
+      )}
+
+      <Skeleton className="w-[12ch] h-3 bg-gray-100  dark:bg-gray-800 rounded" />
+      {Array(2).fill(1).map((n, i) =>
+        <div key={i} className="w-full flex gap-2">
+          <Skeleton className="h-10 w-10  bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="flex flex-col w-full justify-between">
+            <Skeleton className="h-4 w-[12ch] bg-gray-200  dark:bg-gray-700 rounded" />
+            <Skeleton className="h-4 bg-gray-100  dark:bg-gray-800 rounded" />
+          </div>
+        </div>
+      )}
+
+    </div>
+    <div className="flex-1 p-2 px-3 flex justify-between">
+      <Skeleton className="w-[10ch] h-3 bg-gray-200  dark:bg-gray-700 rounded" />
+      <Skeleton className="w-[10ch] h-3 bg-gray-200  dark:bg-gray-700 rounded" />
+    </div>
+
+  </div>
 })
+
+const TEST_LOADING = true
 
 
 
@@ -106,10 +136,7 @@ export default function Home() {
          </div>
 
          <AppSearch />
-{/* 
-        <p className="border w-full h-[395px] bg-white dark:bg-gray-800 flex justify-center items-center text-gray-500 rounded-xl">
-          <Skeleton className="w-full h-6" />
-        </p> */}
+           
     
 
          <div className="text-xs sm:text-lg text-gray-500 dark:text-gray-300 tracking-wide flex flex-col text-center items-center">
@@ -126,7 +153,7 @@ export default function Home() {
       </section>
 
 
-      <section className="pt-[10vh] w-full">
+      <section className="pt-[10vh]">
         <CodeBlock code={`
 import Srch, { useSrch } from 'srch'
 
@@ -134,6 +161,12 @@ import Srch, { useSrch } from 'srch'
 
   // provide any data, consistency recommended
   searchable={[ ... ]}
+
+  // customize your search results
+  threshold={ 0.6 }
+  fieldNorm={ 0.8 }
+  distance={ 200 }
+  minMatch={ 3 }
 
   // easily handle click and keyboard events
   onSelect={(result, index) => 
@@ -158,7 +191,20 @@ import Srch, { useSrch } from 'srch'
     </main>
   );
 }
-
+// // set your own weights and value paths
+// keys = {
+//   [
+//   'title',
+//   {
+//     name: 'content',
+//     weight: 0.4,,
+//   },
+//   {
+//     name: 'tags'
+//       weight: 0.2,
+//     getFn: (obj, path) => obj.user.tags
+//   }
+//   ]}
 
      
 //       <section className="w-full min-h-[90vh] w-full flex flex-col items-center  justify-start pt-8 sm:pt-0 sm:justify-center">

@@ -4,14 +4,18 @@
 
 
 * {
-    border: 1px solid #8882;
+    /* border: 1px solid #8882; */
+}
+
+html, body{
+    max-width: 100vw !important;
+    overflow-x: hidden;
 }
 
 body {
+    position: relative;
     height: auto;
     max-height: 100vh;
-    width: 100vw;
-    max-width: 100vw;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -23,7 +27,9 @@ section {
     justify-content: center;
     align-items: center;
     gap: 4rem;
-    max-width: 700px;
+    max-width: 700px !important;
+    width: 100%;
+    @apply px-4;
 }
 
 .spot {
@@ -128,7 +134,7 @@ section {
 }
 
 .codeblock * {
-    font-size: .7rem;
+    font-size: .9rem;
      line-height: 1rem !important;
      background: transparent !important;
 
