@@ -2,12 +2,52 @@ import Image from "next/image";
 import AppSearch from "@/components/AppSearch";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
-import { CopyIcon, GithubIcon } from "lucide-react";
+import { CopyIcon, ExternalLink, GithubIcon, HeartHandshake, HeartIcon, ReplyIcon } from "lucide-react";
+import { CodeBlock } from "@/components/code-block";
+
+const GitHubButton = () => (
+  <Button
+    variant="ghost"
+    className="w-min sm:w-full flex items-center gap-2 pl-2 pr-4 group"
+  >
+    <div className="rounded-full bg-gray-600 text-gray-100 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1 group-hover:bg-gray-900 duration-200">
+      <GithubIcon />
+    </div>
+    pratiqdev/srch
+  </Button>
+)
+
+const NpmButton = () => (
+  <>
+  <Button
+    variant="secondary"
+    className="relative w-min sm:w-full flex items-center gap-2 px-2 pl-4 group line-through"
+    >
+    <div className="absolute top-[-1.5rem] right-[-.5rem] group-hover:text-orange-500 group-hover:bounce duration-200">beta<ReplyIcon className="rotate-45 translate-x-5"/></div>
+    npm install srch
+    <div className="rounded-full bg-gray-200 text-gray-900 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1 bg-grey-300  group-hover:bg-gray-400 duration-200">
+      <CopyIcon />
+    </div>
+  </Button>
+  </>
+)
+
+const UserButton = () => (
+  <Button
+    variant="secondary"
+    className="w-min sm:w-full flex items-center gap-2 px-2 pl-4 group"
+  >
+    pratiqdev
+    <div className="relative rounded-full bg-gray-200 text-gray-900 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1 bg-grey-300  group-hover:bg-gray-400 duration-200">
+      <Image fill alt='avatar' src='https://avatars.githubusercontent.com/u/53705976?v=4' />
+    </div>
+  </Button>
+)
 
 export default function Home() {
   return (
     <main
-      className="flex min-h-screen flex-col items-center max-w-[700px] mx-auto"
+      className="flex min-h-screen flex-col items-center max-w-[600px] mx-auto pb-6"
       suppressHydrationWarning
     >
 
@@ -15,43 +55,59 @@ export default function Home() {
        <ThemeSwitch />
       </div>
       
-      <section className="min-h-screen w-full flex flex-col items-center justify-center">
-        <div className="flex items-center justify-between w-full px-4 pb-16">
-          <div>
+      <section className="w-full min-h-screen w-full flex flex-col items-center  justify-start pt-8 sm:pt-0 sm:justify-center">
+        <div className="flex flex-col sm:flex-row items-center justify-between w-full px-6 pb-16">
+          <div className="w-full">
+            <h1 className="text-sm tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 mb-[-.5rem] rounded px-2 w-min">v0.1.0</h1>
             <h1 className="text-5xl font-bold tracking-wide">srch</h1>
             <p className="text-xl text-gray-500 dark:text-gray-300 tracking-wide">
               Drop-in, feature-rich, search for React
             </p>
          
           </div>
-          <div className="flex flex-col items-end gap-2 font-regular">
-            <Button
-              variant="secondary"
-              className="w-full flex items-center gap-2 px-2"
-            >
-              npm install srch
-              <div className="rounded-full bg-gray-200 text-gray-900 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1">
-                <CopyIcon />
-              </div>
-            </Button>
-
-            <Button
-              variant="ghost"
-              className="w-full flex items-center gap-2 px-2"
-            >
-              <div className="rounded-full bg-gray-900 text-gray-100 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1">
-                <GithubIcon />
-              </div>
-              pratiqdev/srch
-            </Button>
+          <div className="flex flex-row-reverse sm:flex-col pt-8 sm:pt-0 items-end gap-2 font-regular flex-wrap">
+            <NpmButton />
+            <GitHubButton />
           </div>
         </div>
 
         <AppSearch />
 
-        {/* <p className="text-xl text-gray-500 dark:text-gray-300 tracking-wide">
-              More bells and whistles than a Whovillian
-        </p> */}
+        <div className="text-xs text-gray-500 dark:text-gray-300 tracking-wide pt-16 flex flex-col text-center items-center">
+          <p className=" flex items-baseline font-medium">
+            Made with <HeartHandshake size='12' className="mx-1"/> and
+          </p>
+        <div className="flex gap-2 font-light py-1">
+          shadcn-ui | radix-ui | cmdk | fuse.js | tailwindcss
+        </div>
+          <p className=" flex items-baseline font-medium">
+            by pratiqdev
+          </p>
+        </div>
+      </section>
+
+
+      <section className="hidden h-0 sm:flex sm:h-auto w-full flex-col gap-24 items-center  justify-between sm:pt-0 overflow-hidden">
+      <CodeBlock code={`
+import Srch, { useSrch } from 'srch'
+
+<Srch 
+
+  // provide any searchable data, consistency recommended
+  searchable={[ ... ]}
+
+  // easily handle click and keyboard events
+  onSelect={(result, index) => console.log('Selected item:', result) }
+
+  // render your own items
+  RenderItem={(result, index) => <p>{result.title}</p>
+
+/>
+      `} />
+      <div className="w-min">
+        <UserButton />
+      </div>
+
       </section>
 
      

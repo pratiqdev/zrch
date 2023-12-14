@@ -8,6 +8,8 @@ export type FuseConfig = {
     minMatchCharLength: number;
     useExtendedSearch: boolean;
     ignoreFieldNorm: boolean;
+    ignoreLocation: boolean;
+    distance: number;
     fieldNormWeight: number;
     findAllMatches: boolean;
     threshold: number;

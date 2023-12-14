@@ -17,7 +17,7 @@ import React, {
   RefObject,
   Fragment,
 } from "react";
-import { useUpdate } from "@/lib/useUpdate";
+import { useUpdate } from "@/srch/useUpdate";
 import Fuse, { FuseOptionKey, FuseResult } from "fuse.js";
 import createDebug from "debug";
 import { BaseCtx, SrchCtx } from "./types";
@@ -32,7 +32,7 @@ import {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-} from "@/components/ui/command";
+} from "@/srch/ui/command";
 import * as _ from 'lodash-es'
 import { useIsSSR } from "@react-aria/ssr";
 import { createPortal } from "react-dom";
@@ -48,7 +48,8 @@ log("init...");
 
 
 // log(`iconFuse:`, iconFuse.search('^activ'))
-
+// TODO - remove unused context defaults like 
+// TODO - add methods to update fuseConfig by key, or all at once with new config object (they should all be separate props)
 const DEFAULT_CONTEXT: SrchCtx<any>= {
   searchable: [],
   recommended: [],
@@ -64,14 +65,16 @@ const DEFAULT_CONTEXT: SrchCtx<any>= {
     autoCompleteLength: 5,
   },
   fuseConfig: {
-    includeScore: false,
+    includeScore: true,
     includeMatches: false,
     minMatchCharLength: 1,
     useExtendedSearch: true,
     ignoreFieldNorm: false,
-    fieldNormWeight: 0.2,
+    ignoreLocation: false,
+    distance: 500,
+    fieldNormWeight: 0.8,
     findAllMatches: true,
-    threshold: .5,
+    threshold: .3,
     keys: [],
   },
 };
@@ -135,7 +138,7 @@ export type ClassNames = {
 
 
 
-//========================================================================================================================
+//! ========================================================================================================================
 export const useSrch = () => {
   const { ctx, setCtx, mergeCtx } = useContext(srchCtx);
 
@@ -176,14 +179,14 @@ export const useSrch = () => {
   };
 };
 
-//========================================================================================================================
+//! ========================================================================================================================
 export const SrchProvider = <T extends BaseRecord>({
   searchable = [],
   recommended = [],
   searchKeys = [],
   groupBy,
   children,
-  //========
+  //================================================
   useWindow = true,
   useAutocomplete = true,
   placeholder = 'Search...',
@@ -191,15 +194,16 @@ export const SrchProvider = <T extends BaseRecord>({
   useDialog = true,
   onSelect = (result) => console.log('Selected item:', result),
   NoSearchComponent = () => {
-    const { value } = useSrch()
-    return <p>Search for <b>{value || 'anything!'}</b></p>
+    return <div>
+        <p>Search for <b>anything</b></p>
+      </div>
   },
   NoResultsComponent = () => {
     const { value } = useSrch()
     return <p>No results for <b className="tracking-wide">{value}</b></p>
   },
   FooterComponent = () => {
-    return <p>By <b>yourCoolSite.biz</b></p>
+    return <p className="text-gray-500">By /pratiqdev</p>
   },
   RenderItem = ({ result, index }) => {
     return <div>{JSON.stringify(result)}</div>
@@ -355,6 +359,8 @@ export const SrchProvider = <T extends BaseRecord>({
       useExtendedSearch: ctx.fuseConfig.useExtendedSearch,
       minMatchCharLength: ctx.fuseConfig.minMatchCharLength,
       ignoreFieldNorm: ctx.fuseConfig.ignoreFieldNorm,
+      ignoreLocation: ctx.fuseConfig.ignoreLocation,
+      distance: ctx.fuseConfig.distance,
       // increase the importance of shorter text samples
       fieldNormWeight: ctx.fuseConfig.fieldNormWeight,
       findAllMatches: ctx.fuseConfig.findAllMatches,
@@ -371,9 +377,10 @@ export const SrchProvider = <T extends BaseRecord>({
         log(`The data provided to srch must be an array. Received:`, searchable)
         return
     }
-    mergeCtx({ searchable });
+    mergeCtx({ searchable: searchable });
   }, [searchable]);
 
+  
  
 
 
@@ -400,24 +407,30 @@ export const SrchProvider = <T extends BaseRecord>({
               value={ctx.searchValue}
               onValueChange={v => mergeCtx({ searchValue: v })}
           />
-          {useAutocomplete && <div id="srch-autocomplete" className={cn("h-0 translate-y-[-1rem] flex gap-2 text-[12px] px-2 pl-[2.5rem] text-gray-500 font-light", classNames.autocomplete)}>
+          {/* {useAutocomplete && <div id="srch-autocomplete" className={cn("h-0 translate-y-[-1rem] flex gap-2 text-[12px] px-2 pl-[2.35rem] text-gray-500 font-light", classNames.autocomplete)}>
             {ctx?.autocomplete.map((com, idx) => <span key={com + idx}>{com}</span>)}
-          </div>}
+          </div>} */}
           <CommandList className={cn("h-full flex flex-col items-stretch", useDialog && "min-h-[80vh] sm:min-h-[20rem]", classNames.list)}>
-            
+              
+              {useAutocomplete && 
+              <CommandItem disabled id="srch-autocomplete" className={cn("py-0 flex gap-2 text-[12px] text-gray-500 font-light", classNames.autocomplete)}>
+                {ctx?.autocomplete.map((com, idx) => <span key={com + idx}>{com}</span>)}
+              </CommandItem>
+              }
+
             {(ctx.searchValue.length >= ctx.fuseConfig.minMatchCharLength && ctx.searchResults.length === 0) && 
-              <CommandItem className={cn("min-h-[10rem] flex items-center justify-center" , classNames.item)} disabled>
+              <CommandItem className={cn("min-h-[8rem] flex items-center justify-center" , classNames.item)} disabled>
                 <NoResultsComponent  />
               </CommandItem>
             }
             {(ctx.searchValue.length < ctx.fuseConfig.minMatchCharLength && ctx.searchResults.length === 0) && 
-              <CommandItem  className={cn("min-h-[10rem] flex items-center justify-center" , classNames.item)} disabled>
+              <CommandItem  className={cn("min-h-[8rem] flex items-center justify-center" , classNames.item)} disabled>
                 <NoSearchComponent /> 
               </CommandItem>
             }
 
             {RenderList ? <RenderList results={ctx.searchResults} groupedResults={ctx.groupedResults} value={ctx.searchValue} onSelect={onSelect} /> : groupBy ? <GroupedResults /> : <Results />}
-            {recommended.length > 0 && 
+            {recommended?.length > 0 && 
               <CommandGroup heading='Recommended'>
                 {recommended.map((rec, idx) => 
                  RenderItem &&

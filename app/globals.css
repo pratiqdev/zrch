@@ -6,3 +6,82 @@
 * {
     /* border: 1px solid #8882; */
 }
+html, body{
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+.spot {
+    position: absolute;
+    width: 120vh;
+    height: 120vh;
+    border-radius: 80vw;
+    pointer-events: none;
+}
+
+.spot-blue {
+    position: absolute;
+    background-image: radial-gradient(rgba(0, 106, 255, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(-20vw, -5vw);
+}
+
+.spot-purple {
+    position: absolute;
+        background-image:radial-gradient(rgba(102, 0, 255, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(20vw, 5vw);
+}
+
+
+.spot-red {
+    position: absolute;
+    background-image: radial-gradient(rgba(255, 0, 68, 0.2) 20%, #00f0 60%, #00f0);
+    transform: translate(-10vw, 5vw);
+}
+.spot-yellow {
+    position: absolute;
+    background-image: radial-gradient(rgba(255, 238, 0, 0.2) 20%, #00f0 60%, #00f0);
+    transform: translate(30vw,-8vw);
+}
+.grid {
+            background:
+                linear-gradient(-90deg, rgba(0, 0, 0, .05) 1px, transparent 1px),
+                linear-gradient(rgba(0, 0, 0, .05) 1px, transparent 1px),
+                linear-gradient(-90deg, rgba(0, 0, 0, .04) 1px, transparent 1px),
+                linear-gradient(rgba(0, 0, 0, .04) 1px, transparent 1px),
+                linear-gradient(transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+                linear-gradient(-90deg, #aaa 1px, transparent 1px),
+                linear-gradient(-90deg, transparent 3px, #f2f2f2 3px, #f2f2f2 78px, transparent 78px),
+                linear-gradient(#aaa 1px, transparent 1px),
+                #f2f2f2;
+            background-size:
+                4px 4px,
+                4px 4px,
+                80px 80px,
+                80px 80px,
+                80px 80px,
+                80px 80px,
+                80px 80px,
+                80px 80px;
+}
+
+.simple-grid{
+    background-size: 6px 6px;
+        background-image:
+            linear-gradient(to right, #88888804 1px, transparent 1px),
+            linear-gradient(to bottom, #88888804 1px, transparent 1px);
+}
+
+.codeblock * {
+    font-size: .7rem;
+    /* line-height: .01rem !important;
+    padding: 0 !important;
+        margin: 0 !important; */
+    
+}
+.codeblock{
+    min-width: 30rem;
+    max-width: 80vw;
+}
