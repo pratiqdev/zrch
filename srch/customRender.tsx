@@ -14,8 +14,8 @@ export const ItemRender = ({
 
   return (
     <div className="flex text-xs overflow-hidden items-center">
-        {Icon && <Icon />}
-        <div className="flex flex-col ml-2 tracking-wide">
+        {Icon && <Icon className='min-w-5'/>}
+        <div className="flex flex-col ml-2 flex-1 tracking-wide">
           <span className="font-medium">{title}</span>
           <span className="font-light">{text}</span>
         </div>

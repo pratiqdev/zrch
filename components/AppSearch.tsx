@@ -65,7 +65,7 @@ export const welcomeData:WelcomeData[] = [
     //==========================================================================================
     {
         section: 'Options',
-        icon: 'AppWindow',
+        icon: 'Settings',
         title: 'useWindow',
         type: 'boolean',
         default: 'true',

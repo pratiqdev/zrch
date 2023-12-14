@@ -6,45 +6,96 @@
 * {
     /* border: 1px solid #8882; */
 }
-html, body{
-    height: 100vh;
+body{
+    height: auto;
+    max-height: 100vh;
     width: 100vw;
+    max-width: 100vw;
     overflow-x: hidden;
     overflow-y: auto;
 }
 
+section {
+    min-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4rem;
+}
 
 .spot {
     position: absolute;
-    width: 120vh;
-    height: 120vh;
-    border-radius: 80vw;
+    width: 30rem;
+    height: 30rem;
+    border-radius: 30rem;
     pointer-events: none;
+    z-index: -1;
 }
 
-.spot-blue {
-    position: absolute;
+.spot-1 {
+    /* blue*/
     background-image: radial-gradient(rgba(0, 106, 255, 0.1) 20%, #00f0 60%, #00f0);
-    transform: translate(-20vw, -5vw);
+    transform: translate(-40%, 10%);
 }
 
-.spot-purple {
-    position: absolute;
-        background-image:radial-gradient(rgba(102, 0, 255, 0.1) 20%, #00f0 60%, #00f0);
-    transform: translate(20vw, 5vw);
+.spot-2 {
+    /* purple*/
+    background-image:radial-gradient(rgba(102, 0, 255, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(40%, 20%);
+}
+
+.spot-3 {
+    /* red*/
+    background-image: radial-gradient(rgba(255, 0, 68, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(50%, 30%);
+}
+
+.spot-4 {
+    /* yellow*/
+    background-image: radial-gradient(rgba(255, 238, 0, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(-30%, 40%);
 }
 
 
-.spot-red {
-    position: absolute;
-    background-image: radial-gradient(rgba(255, 0, 68, 0.2) 20%, #00f0 60%, #00f0);
-    transform: translate(-10vw, 5vw);
+.spot-5 {
+    /* mint */
+    background-image: radial-gradient(rgba(6, 245, 217, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(-40%, 180%);
 }
-.spot-yellow {
-    position: absolute;
-    background-image: radial-gradient(rgba(255, 238, 0, 0.2) 20%, #00f0 60%, #00f0);
-    transform: translate(30vw,-8vw);
+
+
+.spot-6 {
+    /* blue*/
+    background-image: radial-gradient(rgba(0, 106, 255, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(-40%, 180%);
 }
+
+.spot-7 {
+    /* purple*/
+    background-image: radial-gradient(rgba(102, 0, 255, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(40%, 190%);
+}
+
+.spot-8 {
+    /* red*/
+    background-image: radial-gradient(rgba(255, 0, 68, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(50%, 220%);
+}
+
+.spot-9 {
+    /* yellow*/
+    background-image: radial-gradient(rgba(255, 238, 0, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(-30%, 170%);
+}
+
+
+.spot-10 {
+    /* mint */
+    background-image: radial-gradient(rgba(6, 245, 217, 0.1) 20%, #00f0 60%, #00f0);
+    transform: translate(40%, 220%);
+}
+
 .grid {
             background:
                 linear-gradient(-90deg, rgba(0, 0, 0, .05) 1px, transparent 1px),
