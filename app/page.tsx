@@ -1,20 +1,40 @@
 import Image from "next/image";
-import AppSearch from "@/components/AppSearch";
+// import AppSearch from "@/components/AppSearch";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { CopyIcon, ExternalLink, GithubIcon, HeartHandshake, HeartIcon, ReplyIcon } from "lucide-react";
-import { CodeBlock } from "@/components/code-block";
+import Link from "next/link";
+// import { CodeBlock } from "@/components/code-block";
+
+import dynamic from 'next/dynamic'
+
+const CodeBlock = dynamic(() => import('@/components/code-block'), {
+  loading: () => <p>Loading codeblock...</p>,
+})
+
+const AppSearch = dynamic(() => import('@/components/AppSearch'), {
+  ssr: false,
+  loading: () => <p className="w-full h-[395px] bg-white dark:bg-gray-800 flex justify-center items-center text-gray-500 rounded-xl">
+    <Skeleton className="w-full h-6" />
+  </p>,
+})
+
+
 
 const GitHubButton = () => (
+  <Link passHref href="">
+
   <Button
     variant="ghost"
     className="w-min sm:w-full flex items-center gap-2 pl-2 pr-4 group border border-transparent group-hover:border-black"
-  >
+    >
     <div className="rounded-full bg-gray-600 text-gray-100 h-6 w-6 flex items-center justify-center text-center overflow-hidden p-1 group-hover:bg-gray-900  duration-200">
       <GithubIcon />
     </div>
     pratiqdev/srch
   </Button>
+  </Link>
 )
 
 const NpmButton = () => (
@@ -67,12 +87,12 @@ export default function Home() {
       <div className="spot spot-9"></div>
       <div className="spot spot-10"></div>
 
-      <section>
-         <div className="flex flex-col sm:flex-row items-center justify-between w-full px-6">
+      <section className="min-h-[90vh]">
+         <div className="flex flex-col sm:flex-row items-center justify-between w-full">
            <div className="w-full">
              <h1 className="text-sm tracking-wider bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 mb-[-.5rem] rounded px-2 w-min">v0.1.0</h1>
              <h1 className="text-5xl font-bold tracking-wide">srch</h1>
-             <p className="text-xl text-gray-500 dark:text-gray-300 tracking-wide">
+             <p className="text-lg sm:text-xl text-gray-500 dark:text-gray-300 tracking-wide">
                Drop-in, feature-rich, search for React
              </p>
          
@@ -86,13 +106,17 @@ export default function Home() {
          </div>
 
          <AppSearch />
+{/* 
+        <p className="border w-full h-[395px] bg-white dark:bg-gray-800 flex justify-center items-center text-gray-500 rounded-xl">
+          <Skeleton className="w-full h-6" />
+        </p> */}
     
 
-         <div className="text-xs text-gray-500 dark:text-gray-300 tracking-wide flex flex-col text-center items-center">
+         <div className="text-xs sm:text-lg text-gray-500 dark:text-gray-300 tracking-wide flex flex-col text-center items-center">
            <p className=" flex items-baseline font-medium">
              Made with <HeartHandshake size='12' className="mx-1"/> and
            </p>
-         <div className="flex gap-2 font-light py-1">
+         <div className="flex gap-2 font-light py-1 tracking-wider">
            shadcn-ui | radix-ui | cmdk | fuse.js | tailwindcss
          </div>
            <p className=" flex items-baseline font-medium">
@@ -102,20 +126,24 @@ export default function Home() {
       </section>
 
 
-      <section>
+      <section className="pt-[10vh] w-full">
         <CodeBlock code={`
 import Srch, { useSrch } from 'srch'
 
 <Srch 
 
-  // provide any searchable data, consistency recommended
+  // provide any data, consistency recommended
   searchable={[ ... ]}
 
   // easily handle click and keyboard events
-  onSelect={(result, index) => console.log('Selected item:', result) }
+  onSelect={(result, index) => 
+    console.log('Selected item:', result) 
+  }
 
   // render your own items
-  RenderItem={(result, index) => <p>{result.title}</p>
+  RenderItem={(result, index) => 
+    <p>{result.title}</p>
+  }
 
 />
       `} />

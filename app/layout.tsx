@@ -32,6 +32,8 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="system"
             enableSystem
+            storageKey='srch_theme'
+            enableColorScheme
             // disableTransitionOnChange
           >
             {children}

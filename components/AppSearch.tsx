@@ -145,10 +145,8 @@ export const welcomeData:WelcomeData[] = [
 const Search = () => {
     return (
         <>
-        <div id="blap" className="h-auto w-full flex justify-center items-center max-w-screen px-6 min-h-[20rem]">
-                <div className="spot spot-blue"></div>
-                <div className="spot spot-purple"></div>
-        </div>
+        <div id="blap" className="h-auto w-full flex justify-center items-center min-h-[20rem]">
+            </div>
         <Srch
             classNames={{
                     wrapper: 'rounded-xl z-50 shadow-2xl dark:border dark:border-gray-800',
