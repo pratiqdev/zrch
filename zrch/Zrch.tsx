@@ -17,11 +17,11 @@ import React, {
   RefObject,
   Fragment,
 } from "react";
-import { useUpdate } from "@/srch/useUpdate";
+import { useUpdate } from "@/zrch/useUpdate";
 import Fuse, { FuseOptionKey, FuseResult } from "fuse.js";
 import createDebug from "debug";
-import { BaseCtx, SrchCtx } from "./types";
-import { getProbableKeys, getUniqueStrings, getUniqueTopLevelKeys } from "./srchUtils";
+import { BaseCtx, ZrchCtx } from "./types";
+import { getProbableKeys, getUniqueStrings, getUniqueTopLevelKeys } from "./zrchUtils";
 import {
   Command,
   CommandInput,
@@ -32,14 +32,14 @@ import {
   CommandItem,
   CommandShortcut,
   CommandSeparator,
-} from "@/srch/ui/command";
+} from "@/zrch/ui/command";
 import * as _ from 'lodash-es'
 import { useIsSSR } from "@react-aria/ssr";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { ClassValue } from "class-variance-authority/types";
 
-const log = createDebug("srch");
+const log = createDebug("zrch");
 createDebug.disable()
 log("init...");
 
@@ -50,7 +50,7 @@ log("init...");
 // log(`iconFuse:`, iconFuse.search('^activ'))
 // TODO - remove unused context defaults like 
 // TODO - add methods to update fuseConfig by key, or all at once with new config object (they should all be separate props)
-const DEFAULT_CONTEXT: SrchCtx<any>= {
+const DEFAULT_CONTEXT: ZrchCtx<any>= {
   searchable: [],
   recommended: [],
   autocomplete: [],
@@ -79,7 +79,7 @@ const DEFAULT_CONTEXT: SrchCtx<any>= {
   },
 };
 
-const srchCtx = createContext<BaseCtx<any>>({
+const zrchCtx = createContext<BaseCtx<any>>({
   ctx: DEFAULT_CONTEXT,
   setCtx: () => {},
   mergeCtx: () => {},
@@ -96,10 +96,10 @@ const srchCtx = createContext<BaseCtx<any>>({
 //     // check each like string for actual keys from allKeys
 //     // get the fuseResults from each search
 //     let res = like.flatMap(l => {
-//         let srch = keyFuse.search(l)
-//         log(`findValueLike | 0:`, l, srch)
+//         let zrch = keyFuse.search(l)
+//         log(`findValueLike | 0:`, l, zrch)
 
-//         return srch
+//         return zrch
 //     })
 //     log(`findValueLike | 1:`, like, res)
     
@@ -139,8 +139,8 @@ export type ClassNames = {
 
 
 //! ========================================================================================================================
-export const useSrch = () => {
-  const { ctx, setCtx, mergeCtx } = useContext(srchCtx);
+export const useZrch = () => {
+  const { ctx, setCtx, mergeCtx } = useContext(zrchCtx);
 
   const setValue = (value?: string) => {
     if (!value || typeof value !== "string") {
@@ -180,7 +180,7 @@ export const useSrch = () => {
 };
 
 //! ========================================================================================================================
-export const SrchProvider = <T extends BaseRecord>({
+export const ZrchProvider = <T extends BaseRecord>({
   searchable = [],
   recommended = [],
   searchKeys = [],
@@ -199,7 +199,7 @@ export const SrchProvider = <T extends BaseRecord>({
       </div>
   },
   NoResultsComponent = () => {
-    const { value } = useSrch()
+    const { value } = useZrch()
     return <p>No results for <b className="tracking-wide">{value}</b></p>
   },
   FooterComponent = () => {
@@ -233,7 +233,7 @@ export const SrchProvider = <T extends BaseRecord>({
   classNames?: ClassNames;
 }) => {
    //===========================================
-  const [ctx, setCtx] = useState<SrchCtx<T>>(DEFAULT_CONTEXT);
+  const [ctx, setCtx] = useState<ZrchCtx<T>>(DEFAULT_CONTEXT);
   const fuseRef = useRef<null | Fuse<T>>(null);
   const keyFuseRef = useRef<null | Fuse<string>>(null);
   const autocompleteFuseRef = useRef<null | Fuse<string>>(null);
@@ -245,13 +245,13 @@ export const SrchProvider = <T extends BaseRecord>({
    *
    * causes global rerender as object ref change causes react state update */
   const mergeCtx = (
-    newCtx: Partial<SrchCtx<T>> | SetStateAction<Partial<SrchCtx<T>>>
+    newCtx: Partial<ZrchCtx<T>> | SetStateAction<Partial<ZrchCtx<T>>>
   ) => { 
     try {
       log(`Merging new ctx:`, newCtx);
       setCtx((x) =>
         typeof newCtx === "function"
-          ? (newCtx(x) as SrchCtx<T>)
+          ? (newCtx(x) as ZrchCtx<T>)
           : { ...x, ...newCtx }
       );
     } catch (err) {
@@ -374,7 +374,7 @@ export const SrchProvider = <T extends BaseRecord>({
   useEffect(() => {
     // docRef.current = window?.document
     if (!Array.isArray(searchable)) {
-        log(`The data provided to srch must be an array. Received:`, searchable)
+        log(`The data provided to zrch must be an array. Received:`, searchable)
         return
     }
     mergeCtx({ searchable: searchable });
@@ -389,7 +389,7 @@ export const SrchProvider = <T extends BaseRecord>({
 
 
   return (
-    <srchCtx.Provider value={{ ctx, setCtx, mergeCtx }} >
+    <zrchCtx.Provider value={{ ctx, setCtx, mergeCtx }} >
 
       {children}
 
@@ -407,13 +407,13 @@ export const SrchProvider = <T extends BaseRecord>({
               value={ctx.searchValue}
               onValueChange={v => mergeCtx({ searchValue: v })}
           />
-          {/* {useAutocomplete && <div id="srch-autocomplete" className={cn("h-0 translate-y-[-1rem] flex gap-2 text-[12px] px-2 pl-[2.35rem] text-gray-500 font-light", classNames.autocomplete)}>
+          {/* {useAutocomplete && <div id="zrch-autocomplete" className={cn("h-0 translate-y-[-1rem] flex gap-2 text-[12px] px-2 pl-[2.35rem] text-gray-500 font-light", classNames.autocomplete)}>
             {ctx?.autocomplete.map((com, idx) => <span key={com + idx}>{com}</span>)}
           </div>} */}
           <CommandList className={cn("h-full flex flex-col items-stretch", useDialog && "min-h-[80vh] sm:min-h-[20rem]", classNames.list)}>
               
               {useAutocomplete && 
-              <CommandItem disabled id="srch-autocomplete" className={cn("py-0 flex gap-2 text-[12px] text-gray-500 font-light", classNames.autocomplete)}>
+              <CommandItem disabled id="zrch-autocomplete" className={cn("py-0 flex gap-2 text-[12px] text-gray-500 font-light", classNames.autocomplete)}>
                 {ctx?.autocomplete.map((com, idx) => <span key={com + idx}>{com}</span>)}
               </CommandItem>
               }
@@ -441,7 +441,7 @@ export const SrchProvider = <T extends BaseRecord>({
               </CommandGroup>
             }
             </CommandList>
-            {FooterComponent && <CommandItem disabled id="srch-footer"  className={cn("flex justify-between items-center text-xs", classNames.footer)}>
+            {FooterComponent && <CommandItem disabled id="zrch-footer"  className={cn("flex justify-between items-center text-xs", classNames.footer)}>
               <FooterComponent />
             </CommandItem>}
           </Wrapper>,
@@ -460,8 +460,8 @@ export const SrchProvider = <T extends BaseRecord>({
       {/* <pre className="text-gray-700 dark:text-gray-200 text-xs ">
             {JSON.stringify(ctx, null, 2)}
         </pre> */}
-    </srchCtx.Provider>
+    </zrchCtx.Provider>
   );
 };
 
-export default SrchProvider
+export default ZrchProvider

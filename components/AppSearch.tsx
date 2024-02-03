@@ -1,13 +1,13 @@
 "use client"
-import Srch, { useSrch } from '@/srch/Srch'
-import { commentData, albumData,  userData, customData } from '@/srch/test-data'
-import { ItemRender, ListRender } from '@/srch/customRender'
+import Zrch, { useZrch } from '@/zrch/Zrch'
+import { commentData, albumData,  userData, customData } from '@/zrch/test-data'
+import { ItemRender, ListRender } from '@/zrch/customRender'
 import { Button } from './ui/button'
 import { useRef } from 'react'
 import * as LucideIcons from 'lucide-react'
 
 const Control = () => {
-    const {toggleWindow} = useSrch()
+    const {toggleWindow} = useZrch()
     return <Button onClick={() => toggleWindow(true)}>Search</Button>
 }
 type WelcomeData = {
@@ -26,7 +26,7 @@ export const welcomeData:WelcomeData[] = [
         icon: 'TestTube',
         title: 'Beta Testing',
         text: 'Browse or create issues to contribute',
-        href: 'https://github.com/pratiqdev/srch'
+        href: 'https://github.com/pratiqdev/zrch'
     },
     //==========================================================================================
     //==========================================================================================
@@ -135,9 +135,9 @@ export const welcomeData:WelcomeData[] = [
     {
         section: 'Hooks',
         icon: 'Webhook',
-        title: 'useSrch',
-        text: 'Access and update internal state with helper methods provided in the `useSrch` hook',
-        href: '/use-srch#getting-started'
+        title: 'useZrch',
+        text: 'Access and update internal state with helper methods provided in the `useZrch` hook',
+        href: '/use-zrch#getting-started'
     },
 ]
 
@@ -147,7 +147,7 @@ const Search = () => {
         <>
         <div id="blap" className="h-auto w-full flex justify-center items-center min-h-[20rem]">
             </div>
-        <Srch
+        <Zrch
             classNames={{
                     wrapper: 'rounded-xl z-50 shadow-2xl dark:border dark:border-gray-800',
                 list: 'min-h-[20rem]'

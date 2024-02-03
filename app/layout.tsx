@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { ThemeProvider } from '@/components/ThemeProvider'
 
 export const metadata: Metadata = {
-  title: 'srch',
+  title: 'zrch',
   description: 'Simple search component',
 }
 
@@ -32,7 +32,7 @@ export default function RootLayout({
             attribute="class"
             defaultTheme="system"
             enableSystem
-            storageKey='srch_theme'
+            storageKey='zrch_theme'
             enableColorScheme
             // disableTransitionOnChange
           >

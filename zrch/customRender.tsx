@@ -1,5 +1,5 @@
 import { FuseResult } from "fuse.js";
-import { CommandItem, CommandGroup } from "@/srch/ui/command";
+import { CommandItem, CommandGroup } from "@/zrch/ui/command";
 import * as LucideIcons from 'lucide-react'
 
 export const ItemRender = ({

@@ -7,7 +7,7 @@ import { Search } from "lucide-react"
 import * as _ from 'lodash-es'
 
 import { cn } from "@/lib/utils"
-import { Dialog, DialogContent } from "@/srch/ui/dialog"
+import { Dialog, DialogContent } from "@/zrch/ui/dialog"
 
 const Command = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
